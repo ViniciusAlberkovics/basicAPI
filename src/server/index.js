@@ -35,8 +35,7 @@ app.use('/auth', authRoute);
 //#endregion
 
 const port = process.env.PORT || 5001;
-const hostname = 'localhost';
 
-app.listen(port, hostname, () => {
-    console.log(`Listening on http://${hostname}:${port}/`);
+app.listen(port, () => {
+    console.log(`Listening on http://localhost:${port}/`);
 });
