@@ -1,6 +1,6 @@
 const jwt = require('../helpers/jwt');
 const mongoose = require('mongoose');
-const User = mongoose.model('User');
+const User = mongoose.model('user');
 
 exports.get = (req, res) => {
     res.json({ message: 'foi' });

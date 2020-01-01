@@ -9,8 +9,9 @@ const middleware = require('../middlewares/index');
 let mongoConnection = 'mongodb+srv://nodeAPI:pZLUe72QqZKOnmHn@clusterunique-8sk5m.mongodb.net/BasicAPI'
 mongoose.connect(mongoConnection);
 
+
 //Load Models
-const User = require('../models/user');
+require('../models/user');
 
 //#region Imports Routes
 const indexRoute = require('../routes/indexRoute');
