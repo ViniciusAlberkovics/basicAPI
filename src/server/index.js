@@ -34,8 +34,8 @@ app.use('/', indexRoute);
 app.use('/auth', authRoute);
 //#endregion
 
-const port = 3000;
-const hostname = '127.0.0.1';
+const port = process.env.PORT || 5001;
+const hostname = 'localhost';
 
 app.listen(port, hostname, () => {
     console.log(`Listening on http://${hostname}:${port}/`);
