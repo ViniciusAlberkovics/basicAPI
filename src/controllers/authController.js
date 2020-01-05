@@ -1,21 +1,20 @@
 const jwt = require('../helpers/jwt');
 const mongoose = require('mongoose');
 const User = mongoose.model('user');
+const repository = require('../repositories/authRepository');
 
 exports.get = (req, res) => {
     res.json({ message: 'foi' });
 };
 
-exports.post = (req, res) => {
-    let user = new User(req.body);
-    user.save()
-        .then(u => {
-            let token = jwt.sign({ id: u._id, name: u.name, email: u.email });
-            res.status(201).json({ token });
-        })
-        .catch(e => {
-            res.status(400).json({ message: 'E-mail already registered', data: e });
-        });
+exports.post = async (req, res) => {
+    try {
+        let u = await repository.create(req.body);
+        let token = jwt.sign({ id: u._id, name: u.name, email: u.email });
+        return res.status(201).json({ token });
+    } catch (error) {
+        return res.status(400).json({ message: 'E-mail already registered', data: error });
+    }
 };
 
 exports.put = (req, res) => {
@@ -30,25 +29,24 @@ exports.patch = (req, res) => {
     res.json({ message: 'No idea' });
 };
 
-exports.login = (req, res) => {
-    User.findOne({ email: req.body.email })
-        .then(u => {
-            if (u) {
-                if (u.password === req.body.password) {
-                    if (u.active) {
-                        let token = jwt.sign({ id: u._id, name: u.name, email: u.email });
-                        res.status(200).json({ token });
-                    } else {
-                        res.status(400).json({ message: 'Inactive user.' });
-                    }
+exports.login = async (req, res) => {
+    try {
+        let u = await repository.login(req.body.email);
+        if (u) {
+            if (u.password === req.body.password) {
+                if (u.active) {
+                    let token = jwt.sign({ id: u._id, name: u.name, email: u.email });
+                    return res.status(200).json({ token });
                 } else {
-                    res.status(400).json({ message: 'Incorrect password.' });
+                    return res.status(400).json({ message: 'Inactive user.' });
                 }
             } else {
-                res.status(400).json({ message: 'Unregistered user.' });
+                return res.status(400).json({ message: 'Incorrect password.' });
             }
-        })
-        .catch(e => {
-            throw e;
-        });
+        } else {
+            return res.status(400).json({ message: 'Unregistered user.' });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: 'Erro interno, tente novamente mais tarde' });
+    }
 }
