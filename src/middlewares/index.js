@@ -1,4 +1,4 @@
-const  path = require('path')
+const path = require('path')
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const basePath = __dirname.substr(0, __dirname.lastIndexOf(path.sep));
@@ -12,7 +12,7 @@ exports.apiAuthorization = (req, res, next) => {
 }
 
 exports.error = (err, req, res, next) => {
-    res.status(500).json({ message: 'Error performing operation!', data: err });
+    return res.status(500).json({ message: 'Error performing operation!', data: err });
 }
 
 exports.verifyJWT = (req, res, next) => {
@@ -29,7 +29,34 @@ exports.verifyJWT = (req, res, next) => {
                 return res.status(500).json({ message: 'Failed to authenticate token.' });
         }
 
-        req.userId = decoded.id;
-        next();
+        req.userInfo = {
+            id: decoded.id,
+            roles: decoded.roles
+        }
+
+        if (next)
+            next();
     });
+}
+
+exports.verifyJWTRoles = (roles, req, res, next) => {
+    this.verifyJWT(req, res, null);
+    if (!res.finished) {
+        let authorize = false;
+        if (Array.isArray(roles)) {
+            roles.forEach(r => {
+                if (req.userInfo.roles.includes(r)) {
+                    authorize = true;
+                }
+            });
+        } else if (req.userInfo.roles.includes(roles)) {
+            authorize = true;
+        }
+
+        if (authorize) {
+            next();
+        } else {
+            return res.status(403).json({ message: 'Unauthorized user.' });
+        }
+    }
 }

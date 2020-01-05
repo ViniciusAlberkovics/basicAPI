@@ -1,7 +1,5 @@
 const md5 = require('md5');
-const mongoose = require('mongoose');
 const jwt = require('../helpers/jwt');
-const User = mongoose.model('user');
 const repository = require('../repositories/authRepository');
 
 exports.get = (req, res) => {
@@ -12,10 +10,10 @@ exports.post = async (req, res) => {
     try {
         req.body.password = md5(req.body.password)
         let u = await repository.create(req.body);
-        let token = jwt.sign({ id: u._id, name: u.name, email: u.email });
+        let token = jwt.signUser(u);
         return res.status(201).json({ token });
     } catch (error) {
-        return res.status(400).json({ message: 'E-mail already registered', data: error });
+        return res.status(500).json({ message: 'Error', data: error });
     }
 };
 
@@ -37,7 +35,7 @@ exports.login = async (req, res) => {
         if (u) {
             if (u.password === md5(req.body.password)) {
                 if (u.active) {
-                    let token = jwt.sign({ id: u._id, name: u.name, email: u.email });
+                    let token = jwt.signUser(u);
                     return res.status(200).json({ token });
                 } else {
                     return res.status(400).json({ message: 'Inactive user.' });
@@ -49,6 +47,24 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: 'Unregistered user.' });
         }
     } catch (error) {
-        return res.status(500).json({ message: 'Erro interno, tente novamente mais tarde' });
+        throw error;
+    }
+}
+
+exports.refreshToken = async (req, res) => {
+    try {
+        let user = await repository.getById(req.userInfo.id);
+        if (user) {
+            if (user.active) {
+                let token = jwt.signUser(user);
+                return res.status(200).json({ token });
+            } else {
+                return res.status(400).json({ message: 'Inactive user.' });
+            }
+        } else {
+            return res.status(400).json({ message: 'Unregistered user.' });
+        }
+    } catch (error) {
+        throw error;
     }
 }

@@ -9,5 +9,6 @@ router.put('/:id', controller.put);
 router.delete('/', controller.del);
 router.patch('/', controller.patch);
 router.post('/login', controller.login);
+router.get('/refresh_token', (req, res, next) => middlware.verifyJWTRoles(['user'], req, res, next), controller.refreshToken)
 
 module.exports = router;

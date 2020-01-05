@@ -11,3 +11,8 @@ exports.login = async (email) => {
     let login = await User.findOne({ email: email });
     return login;
 }
+
+exports.getById = async (id) => {
+    let user = await User.findById(id);
+    return user;
+}

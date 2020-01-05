@@ -27,7 +27,19 @@ const schema = new Schema({
         type: Boolean,
         required: true,
         default: true
-    }
+    },
+    roles: [{
+        type: String,
+        required: true,
+        enum: ['user', 'admin', 'others'],
+        validate: {
+            validator: function (roles) {
+                if (roles.length === 0)
+                    return false
+                else return true
+            }
+        }
+    }]
 });
 
 module.exports = mongoose.model('user', schema, 'user');
