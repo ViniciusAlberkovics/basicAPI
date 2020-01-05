@@ -1,5 +1,6 @@
 const  path = require('path')
-
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
 const basePath = __dirname.substr(0, __dirname.lastIndexOf(path.sep));
 
 exports.apiAuthorization = (req, res, next) => {

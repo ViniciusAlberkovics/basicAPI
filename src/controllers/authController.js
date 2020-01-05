@@ -5,7 +5,7 @@ const User = mongoose.model('user');
 const repository = require('../repositories/authRepository');
 
 exports.get = (req, res) => {
-    res.json({ message: 'foi' });
+    return res.json({ message: 'foi c token' });
 };
 
 exports.post = async (req, res) => {
