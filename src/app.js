@@ -3,19 +3,19 @@ const cors = require('cors');
 const helmet = require('helmet');
 const mongoose = require('mongoose');
 
-const middleware = require('../middlewares/index');
+const middleware = require('./middlewares/index');
+const configs = require('./config');
 
 //Connect DB
-let mongoConnection = 'mongodb+srv://nodeAPI:pZLUe72QqZKOnmHn@clusterunique-8sk5m.mongodb.net/BasicAPI'
-mongoose.connect(mongoConnection);
+mongoose.connect(configs.connectionString);
 
 
 //Load Models
-require('../models/user');
+require('./models/user');
 
 //#region Imports Routes
-const indexRoute = require('../routes/indexRoute');
-const authRoute = require('../routes/authRoute');
+const indexRoute = require('./routes/indexRoute');
+const authRoute = require('./routes/authRoute');
 //#endregion
 
 const app = new Express();

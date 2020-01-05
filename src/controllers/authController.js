@@ -1,5 +1,6 @@
-const jwt = require('../helpers/jwt');
+const md5 = require('md5');
 const mongoose = require('mongoose');
+const jwt = require('../helpers/jwt');
 const User = mongoose.model('user');
 const repository = require('../repositories/authRepository');
 
@@ -9,6 +10,7 @@ exports.get = (req, res) => {
 
 exports.post = async (req, res) => {
     try {
+        req.body.password = md5(req.body.password)
         let u = await repository.create(req.body);
         let token = jwt.sign({ id: u._id, name: u.name, email: u.email });
         return res.status(201).json({ token });
@@ -33,7 +35,7 @@ exports.login = async (req, res) => {
     try {
         let u = await repository.login(req.body.email);
         if (u) {
-            if (u.password === req.body.password) {
+            if (u.password === md5(req.body.password)) {
                 if (u.active) {
                     let token = jwt.sign({ id: u._id, name: u.name, email: u.email });
                     return res.status(200).json({ token });
